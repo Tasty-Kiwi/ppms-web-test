@@ -1,0 +1,2 @@
+# PPMS Web Test
+A repsository testing the ability of making PPMS with Three.js. This repository will be merged with [pewpewlive/PPMS](https://github.com/pewpewlive/PPMS) once the code is made compatible with React.
