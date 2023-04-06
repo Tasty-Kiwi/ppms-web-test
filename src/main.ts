@@ -265,7 +265,7 @@ async function init() {
   renderer.render(scene, camera);
   window.addEventListener("resize", onWindowResize);
 
-  function render() {
+  async function render() {
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();
 
@@ -279,7 +279,6 @@ async function init() {
     } else {
       sphereInter.visible = false
     }*/
-
     composer.render();
     stats.update();
   }
