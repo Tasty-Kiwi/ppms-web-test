@@ -1,12 +1,12 @@
 /// <reference lib="webworker" />
 //@ts-ignore
-import { LuaFactory } from "wasmoon";
-import * as Comlink from "comlink";
+import { LuaFactory } from "wasmoon"
+import * as Comlink from "comlink"
 
 interface Mesh {
-  vertexes: Array<Array<number>>;
-  segments: Array<Array<number>>;
-  colors: Array<number>;
+  vertexes: number[][]
+  segments: number[][]
+  colors: number[]
 }
 
 const decompressMeshes = `
@@ -38,7 +38,7 @@ const decompressMeshes = `
       end
       return meshlist
     end
-  end`;
+  end`
 
 const decompressColors = `
   function ()
@@ -62,41 +62,35 @@ const decompressColors = `
       end
       return meshlist
     end
-  end`;
+  end`
 
 export async function parseMesh(luaStr: string, meshId: number): Promise<Mesh> {
-  const factory = new LuaFactory();
+  const factory = new LuaFactory()
 
-  const lua = await factory.createEngine();
+  const lua = await factory.createEngine()
 
   try {
     // disable potentially dangerous or not supported by PPL libraries from loading (and remove require to replace with js alternative)
-    await lua.doString(
-      "os = nil io = nil debug = nil crypto = nil coroutine = nil utf8 = nil"
-    );
+    await lua.doString("os = nil io = nil debug = nil crypto = nil coroutine = nil utf8 = nil")
 
     // Preload built-in helpers
-    await lua.doString(
-      `package.preload['/ppms/decompress_meshes.lua'] = ${decompressMeshes}`
-    );
-    await lua.doString(
-      `package.preload['/ppms/decompress_colors.lua'] = ${decompressColors}`
-    );
+    await lua.doString(`package.preload['/ppms/decompress_meshes.lua'] = ${decompressMeshes}`)
+    await lua.doString(`package.preload['/ppms/decompress_colors.lua'] = ${decompressColors}`)
 
-    await lua.doString(luaStr);
-    const meshes: Mesh = lua.global.get("meshes");
+    await lua.doString(luaStr)
+    const meshes: Mesh = lua.global.get("meshes")
     //@ts-ignore
-    return meshes[meshId];
+    return meshes[meshId]
   } finally {
     // Close the lua environment, so it can be freed
-    lua.global.close();
+    lua.global.close()
   }
 }
 
 export const workerParseMesh = async (luaStr: string, meshId: number) => {
-  return await parseMesh(luaStr, meshId);
-};
+  return await parseMesh(luaStr, meshId)
+}
 
 Comlink.expose({
   workerParseMesh,
-});
+})
